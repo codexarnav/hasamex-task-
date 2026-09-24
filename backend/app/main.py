@@ -131,3 +131,10 @@ async def root():
         "status": "online",
         "docs": "/docs",
     }
+
+
+@app.get("/health")
+async def health():
+    """Health check endpoint for cloud hosting providers."""
+    return {"status": "ok"}
+
