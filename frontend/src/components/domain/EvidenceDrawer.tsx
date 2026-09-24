@@ -1,0 +1,149 @@
+"use client";
+
+import React, { useEffect } from "react";
+import { cn } from "@/lib/utils";
+import { X, FileText, Clock, User, Globe, ExternalLink } from "lucide-react";
+import { Button } from "../ui/Button";
+import { Evidence } from "@/lib/types";
+
+interface EvidenceDrawerProps {
+  isOpen: boolean;
+  onClose: () => void;
+  evidence: Evidence | null;
+  onOpenTranscript?: (transcriptId: string, utteranceId?: string) => void;
+}
+
+export function EvidenceDrawer({
+  isOpen,
+  onClose,
+  evidence,
+  onOpenTranscript,
+}: EvidenceDrawerProps) {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+      window.addEventListener("keydown", handleKeyDown);
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen || !evidence) return null;
+
+  const timestampDisplay = evidence.timestamp.start
+    ? `${evidence.timestamp.start}${evidence.timestamp.end ? ` - ${evidence.timestamp.end}` : ""}`
+    : "Timestamp not recorded";
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-hidden">
+      <div
+        className="fixed inset-0 bg-slate-900/30 backdrop-blur-xs transition-opacity"
+        onClick={onClose}
+      />
+      <div className="fixed inset-y-0 right-0 flex max-w-full pl-10">
+        <div className="w-screen max-w-md transform bg-card border-l border-border shadow-2xl transition-all">
+          {/* Header */}
+          <div className="flex h-16 items-center justify-between border-b border-border px-6">
+            <div>
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                Grounded Evidence
+              </h2>
+              <div className="text-xs font-mono text-slate-400 mt-0.5">
+                ID: {evidence.id.slice(0, 8)}
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Body Content */}
+          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            {/* Metadata Card */}
+            <div className="rounded-lg border border-border bg-slate-50/70 p-4 space-y-3 text-xs">
+              <div className="flex items-center gap-2 text-foreground font-medium">
+                <User className="h-3.5 w-3.5 text-slate-500" />
+                <span>{evidence.expert.name}</span>
+                {evidence.expert.market && (
+                  <span className="ml-auto inline-flex items-center gap-1 rounded bg-white px-2 py-0.5 text-[11px] font-semibold text-slate-700 border border-border">
+                    <Globe className="h-3 w-3 text-slate-400" />
+                    {evidence.expert.market}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Clock className="h-3.5 w-3.5 text-slate-400" />
+                <span className="font-mono">{timestampDisplay}</span>
+              </div>
+
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <FileText className="h-3.5 w-3.5 text-slate-400" />
+                <span className="truncate">{evidence.transcript.file_name}</span>
+              </div>
+            </div>
+
+            {/* Exact Quote */}
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                Canonical Quote
+              </div>
+              <blockquote className="rounded-lg border-l-2 border-slate-900 bg-slate-50/50 p-4 text-sm font-serif italic leading-relaxed text-slate-800">
+                &ldquo;{evidence.quote}&rdquo;
+              </blockquote>
+            </div>
+
+            {/* Topic & Relevance */}
+            {evidence.topic && (
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
+                  Thematic Classification
+                </div>
+                <div className="inline-block rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-800">
+                  {evidence.topic}
+                </div>
+              </div>
+            )}
+
+            {/* Provenance Chain Note */}
+            <div className="rounded-lg border border-border p-4 bg-white text-xs space-y-1.5 text-muted-foreground">
+              <div className="font-semibold text-foreground">Anti-Hallucination Guarantee</div>
+              <p className="leading-normal">
+                This evidence snippet is indexed directly from the canonical transcript utterance. The quote and timestamps cannot be modified or generated by the LLM.
+              </p>
+            </div>
+          </div>
+
+          {/* Footer Actions */}
+          {onOpenTranscript && (
+            <div className="border-t border-border p-4 bg-slate-50/50">
+              <Button
+                onClick={() =>
+                  onOpenTranscript(
+                    evidence.transcript.id,
+                    evidence.utterance_id || evidence.id
+                  )
+                }
+                variant="outline"
+                className="w-full text-xs font-medium flex items-center justify-center gap-1.5"
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+                <span>View in Full Transcript</span>
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: insightos-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: insightos
+      POSTGRES_PASSWORD: insightos
+      POSTGRES_DB: insightos
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U insightos -d insightos"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  qdrant:
+    image: qdrant/qdrant:v1.12.0
+    container_name: insightos-qdrant
+    restart: unless-stopped
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:6333/healthz || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: insightos-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://insightos:insightos@postgres:5432/insightos
+      QDRANT_URL: http://qdrant:6333
+      QDRANT_COLLECTION: research_utterances
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-test_key}
+      GEMINI_MODEL: gemini-2.5-flash
+      EMBEDDING_MODEL: gemini-embedding-exp-03-07
+      EMBEDDING_DIMENSION: 3072
+      UPLOAD_DIR: data/uploads
+      DEBUG: "false"
+    volumes:
+      - uploads_data:/app/data/uploads
+    command: >
+      sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+volumes:
+  postgres_data:
+  qdrant_data:
+  uploads_data:
