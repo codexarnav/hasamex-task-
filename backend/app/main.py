@@ -31,7 +31,6 @@ async def lifespan(app: FastAPI):
     """Application startup and shutdown lifespan management."""
     logger.info("Starting InsightOS Backend V1...", extra={"operation": "startup"})
     try:
-        # Attempt Qdrant collection initialization on startup (tolerant if offline during unit tests)
         qdrant_repo = get_qdrant_repository()
         await qdrant_repo.init_collection()
     except Exception as e:
@@ -52,7 +51,6 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -61,11 +59,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount API routes
 app.include_router(api_v1_router)
 
 
-# Global Exception Handlers
 @app.exception_handler(NotFoundError)
 async def not_found_exception_handler(request: Request, exc: NotFoundError):
     return JSONResponse(

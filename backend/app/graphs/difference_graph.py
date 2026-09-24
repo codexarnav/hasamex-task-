@@ -21,12 +21,12 @@ class DifferenceState(TypedDict):
     question_number: int
     question_text: str
     category: str | None
-    expert_answers: list[dict] # [{expert_id, expert_name, market, answer_text, evidence: [{id, quote}]}]
+    expert_answers: list[dict]
     available_evidence_ids: list[str]
     difference_detected: bool
     title: str | None
     description: str | None
-    perspectives: list[dict] # [{expert_id, perspective}]
+    perspectives: list[dict]
     validated_evidence_ids: list[str]
     error: str | None
 
@@ -76,7 +76,6 @@ async def compare_perspectives_node(state: DifferenceState) -> dict:
             for p in result.perspectives
         ]
 
-        # Validate evidence IDs
         available_set = set(state.get("available_evidence_ids", []))
         valid_evidence = [
             str(eid) for eid in result.evidence_ids

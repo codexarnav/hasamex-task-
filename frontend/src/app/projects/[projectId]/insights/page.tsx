@@ -24,7 +24,6 @@ export default function InsightsPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Evidence Drawer & Transcript Viewer states
   const [selectedEvidence, setSelectedEvidence] = useState<Evidence | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
@@ -119,7 +118,7 @@ export default function InsightsPage({
         </div>
       )}
 
-      {/* Evidence Drawer */}
+      {}
       <EvidenceDrawer
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -127,7 +126,7 @@ export default function InsightsPage({
         onOpenTranscript={handleOpenTranscript}
       />
 
-      {/* Transcript Viewer Modal */}
+      {}
       {activeTranscript && (
         <TranscriptViewer
           isOpen={viewerOpen}

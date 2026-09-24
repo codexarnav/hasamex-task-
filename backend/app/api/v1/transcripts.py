@@ -84,7 +84,6 @@ async def get_transcript_utterances(
 ):
     """Get all timestamped utterances for a transcript."""
     service = TranscriptService(db)
-    # Ensure transcript exists
     await service.get_transcript(transcript_id)
     utterances = await service.get_transcript_utterances(transcript_id)
     return TranscriptUtterancesResponse(

@@ -30,7 +30,6 @@ class DifferenceService:
         question: ResearchQuestion,
     ) -> Difference | None:
         """Run difference analysis across experts for a single research question."""
-        # 1. Fetch all answers for this question
         stmt = (
             select(Answer)
             .where(Answer.project_id == project_id, Answer.question_id == question.id)
@@ -45,7 +44,6 @@ class DifferenceService:
         if len(answers) < 2:
             return None
 
-        # Format input for LangGraph
         expert_answers_input = []
         available_evidence_ids = []
 
@@ -63,7 +61,6 @@ class DifferenceService:
                 "evidence": ev_list,
             })
 
-        # Run difference graph
         initial_state = {
             "project_id": str(project_id),
             "question_id": str(question.id),
@@ -82,7 +79,6 @@ class DifferenceService:
 
         final_state = await difference_graph.ainvoke(initial_state)
 
-        # Clear existing difference for this question if re-running
         await self.db.execute(
             delete(Difference).where(
                 Difference.project_id == project_id,
@@ -90,7 +86,6 @@ class DifferenceService:
             )
         )
 
-        # Persist new difference record
         diff_record = Difference(
             project_id=project_id,
             question_id=question.id,
@@ -101,7 +96,6 @@ class DifferenceService:
         await self.db.flush()
         await self.db.refresh(diff_record)
 
-        # Add perspectives
         for p in final_state.get("perspectives", []):
             try:
                 exp_id = UUID(p["expert_id"])
@@ -114,7 +108,6 @@ class DifferenceService:
             except Exception as e:
                 logger.warning(f"Failed to add perspective for expert {p.get('expert_id')}: {e}")
 
-        # Attach evidence items
         if final_state.get("validated_evidence_ids"):
             valid_uuids = [UUID(eid) for eid in final_state["validated_evidence_ids"]]
             ev_stmt = select(Evidence).where(Evidence.id.in_(valid_uuids))

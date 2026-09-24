@@ -26,7 +26,6 @@ class Expert(Base):
         DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc)
     )
 
-    # Relationships
     project: Mapped["Project"] = relationship("Project", back_populates="experts")
     transcripts: Mapped[list["Transcript"]] = relationship(
         "Transcript", back_populates="expert", cascade="all, delete-orphan"

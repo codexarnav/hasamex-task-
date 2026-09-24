@@ -80,7 +80,6 @@ class GeminiClient(LLMClient):
                 response = await asyncio.to_thread(_call)
 
                 raw_text = response.text
-                # Parse JSON and validate with Pydantic
                 parsed_data = json.loads(raw_text)
                 result = response_model.model_validate(parsed_data)
 
@@ -112,7 +111,6 @@ class GeminiClient(LLMClient):
         )
 
 
-# Singleton
 _gemini_client: GeminiClient | None = None
 
 

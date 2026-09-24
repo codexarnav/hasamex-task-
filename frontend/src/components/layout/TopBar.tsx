@@ -23,7 +23,6 @@ export function TopBar({
 }: TopBarProps) {
   const pathname = usePathname();
 
-  // Extract breadcrumb
   const segments = pathname.split("/").filter(Boolean);
   const currentSection = segments[2] || "Overview";
   const formattedSection =
@@ -43,7 +42,7 @@ export function TopBar({
           </Button>
         )}
 
-        {/* Breadcrumb trail */}
+        {}
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Link
             href={`/projects/${projectId}`}

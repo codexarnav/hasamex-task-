@@ -32,7 +32,6 @@ class EvidenceService:
         relevance_score: float | None = 1.0,
     ) -> Evidence:
         """Create an evidence record resolving the quote text directly from the source utterance."""
-        # Fetch canonical quote from Utterance (Anti-hallucination Rule: quote must originate from DB)
         u_stmt = select(Utterance).where(Utterance.id == utterance_id)
         u_res = await self.db.execute(u_stmt)
         utterance = u_res.scalar_one_or_none()
@@ -45,7 +44,7 @@ class EvidenceService:
             transcript_id=transcript_id,
             expert_id=expert_id,
             utterance_id=utterance_id,
-            quote=utterance.text,  # Exact source quote from DB
+            quote=utterance.text,
             topic=topic,
             relevance_score=relevance_score,
         )

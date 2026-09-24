@@ -21,7 +21,6 @@ from app.ai.schemas.difference import DifferenceAnalysisResult, DifferencePerspe
 from app.ai.schemas.insight import InsightGenerationResult, SingleInsight
 from app.ai.schemas.copilot import CopilotSynthesisResult
 
-# Use SQLite in-memory with foreign keys enabled for fast, isolated tests
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 
 test_engine = create_async_engine(
@@ -41,7 +40,6 @@ class MockEmbeddingService(EmbeddingService):
     """Deterministic in-memory embedding service for testing."""
 
     async def embed_text(self, text: str) -> list[float]:
-        # Return fixed 3072-dimensional vector with deterministic values
         val = (float(len(text) % 100) + 1.0) / 100.0
         return [val] * 3072
 
@@ -145,7 +143,6 @@ class MockGeminiClient(LLMClient):
             )
 
         elif response_model == EvidenceExtractionResult:
-            # Extract utterance IDs from prompt text if present
             candidates = []
             import re
             uids = re.findall(r'Utterance ID: ([0-9a-fA-F\-]{36})', prompt)
@@ -229,16 +226,13 @@ class MockGeminiClient(LLMClient):
 @pytest_asyncio.fixture(autouse=True)
 async def setup_test_environment():
     """Setup and teardown in-memory test database and mocked services."""
-    # Set mock retrieval services
     set_embedding_service(MockEmbeddingService())
     mock_qdrant = MockQdrantRepository()
     set_qdrant_repository(mock_qdrant)
 
-    # Set mock Gemini client
     mock_gemini = MockGeminiClient()
     gemini_module._gemini_client = mock_gemini
 
-    # Create tables in SQLite
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 

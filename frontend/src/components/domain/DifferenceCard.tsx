@@ -35,7 +35,7 @@ export function DifferenceCard({ difference, onViewEvidence }: DifferenceCardPro
 
   return (
     <div className="rounded-xl border border-border bg-card p-6 shadow-xs space-y-5">
-      {/* Title & Description */}
+      {}
       <div className="space-y-1.5 pb-3 border-b border-border">
         <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           <GitCompare className="h-3.5 w-3.5 text-slate-500" />
@@ -47,7 +47,7 @@ export function DifferenceCard({ difference, onViewEvidence }: DifferenceCardPro
         )}
       </div>
 
-      {/* Per-Expert Perspectives Grid/Stack */}
+      {}
       <div className="space-y-3">
         <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Contrasting Perspectives
@@ -69,7 +69,7 @@ export function DifferenceCard({ difference, onViewEvidence }: DifferenceCardPro
         </div>
       </div>
 
-      {/* Supporting Evidence Bar */}
+      {}
       {difference.evidence.length > 0 && (
         <div className="pt-2 border-t border-border/60">
           <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">

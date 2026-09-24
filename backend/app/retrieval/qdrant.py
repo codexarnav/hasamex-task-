@@ -54,7 +54,6 @@ class QdrantRepository:
                         distance=rest_models.Distance.COSINE,
                     ),
                 )
-                # Create payload indexes for project_id, expert_id, transcript_id
                 for field_name in ["project_id", "expert_id", "transcript_id", "market"]:
                     await self.client.create_payload_index(
                         collection_name=self.collection_name,
@@ -282,7 +281,6 @@ class QdrantRepository:
             logger.warning(f"Error deleting vectors for transcript {transcript_id}: {e}")
 
 
-# Singleton
 _qdrant_repo: QdrantRepository | None = None
 
 

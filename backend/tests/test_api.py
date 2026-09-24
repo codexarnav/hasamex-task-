@@ -14,7 +14,6 @@ async def test_health_check(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_create_and_get_project(client: AsyncClient):
     """Test creating a project and retrieving it."""
-    # Create project
     create_payload = {
         "name": "MedTech Robotic Adoption Study",
         "objective": "Understand clinical barriers to adoption in European hospitals.",
@@ -27,12 +26,10 @@ async def test_create_and_get_project(client: AsyncClient):
 
     project_id = project_data["id"]
 
-    # Get project by ID
     get_res = await client.get(f"/api/v1/projects/{project_id}")
     assert get_res.status_code == 200
     assert get_res.json()["id"] == project_id
 
-    # List projects
     list_res = await client.get("/api/v1/projects")
     assert list_res.status_code == 200
     assert list_res.json()["total"] >= 1
@@ -41,11 +38,9 @@ async def test_create_and_get_project(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_upload_guide_and_get_questions(client: AsyncClient):
     """Test uploading an interview guide and fetching extracted research questions."""
-    # Create project
     p_res = await client.post("/api/v1/projects", json={"name": "Guide Test Project"})
     project_id = p_res.json()["id"]
 
-    # Upload guide file
     guide_content = b"""
     # Robotic Surgery Guide
     Q1: What are primary capital expense barriers?
@@ -58,7 +53,6 @@ async def test_upload_guide_and_get_questions(client: AsyncClient):
     assert data["total"] == 2
     assert len(data["questions"]) == 2
 
-    # Get questions
     q_res = await client.get(f"/api/v1/projects/{project_id}/questions")
     assert q_res.status_code == 200
     assert q_res.json()["total"] == 2
@@ -67,11 +61,9 @@ async def test_upload_guide_and_get_questions(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_expert_and_transcript_endpoints(client: AsyncClient):
     """Test expert creation and transcript ingestion endpoints."""
-    # Create project
     p_res = await client.post("/api/v1/projects", json={"name": "Expert Test Project"})
     project_id = p_res.json()["id"]
 
-    # Create expert
     expert_payload = {
         "name": "Dr. Sarah Jenkins",
         "role": "Chief of Surgery",
@@ -82,7 +74,6 @@ async def test_expert_and_transcript_endpoints(client: AsyncClient):
     assert exp_res.status_code == 201
     expert_id = exp_res.json()["id"]
 
-    # Upload transcript
     transcript_text = b"""
 00:01:00 - 00:01:30
 Dr. Sarah Jenkins:
@@ -98,7 +89,6 @@ Dr. Sarah Jenkins:
     assert t_res.status_code == 201
     transcript_id = t_res.json()["id"]
 
-    # Get transcript detail
     detail_res = await client.get(f"/api/v1/transcripts/{transcript_id}")
     assert detail_res.status_code == 200
     assert detail_res.json()["utterance_count"] == 1

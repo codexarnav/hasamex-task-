@@ -26,7 +26,6 @@ async def test_vector_search_project_isolation(db_session: AsyncSession):
 
     qdrant = get_qdrant_repository()
 
-    # Index Project A utterances
     await qdrant.upsert_utterances(
         project_id=project_a_id,
         transcript_id=transcript_a_id,
@@ -43,7 +42,6 @@ async def test_vector_search_project_isolation(db_session: AsyncSession):
         ],
     )
 
-    # Index Project B utterances
     await qdrant.upsert_utterances(
         project_id=project_b_id,
         transcript_id=transcript_b_id,
@@ -60,7 +58,6 @@ async def test_vector_search_project_isolation(db_session: AsyncSession):
         ],
     )
 
-    # Search scoped to Project A
     results_a = await qdrant.search_utterances(
         project_id=project_a_id,
         query_vector=[0.5] * 3072,
@@ -70,7 +67,6 @@ async def test_vector_search_project_isolation(db_session: AsyncSession):
     assert results_a[0].utterance_id == utterance_a_id
     assert results_a[0].utterance_id != utterance_b_id
 
-    # Search scoped to Project B
     results_b = await qdrant.search_utterances(
         project_id=project_b_id,
         query_vector=[0.5] * 3072,

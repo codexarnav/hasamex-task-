@@ -45,7 +45,6 @@ class AnalysisService:
             transcript_ids: Optional list of specific transcript IDs to scope analysis to.
                            When provided, only experts/utterances from these transcripts are used.
         """
-        # 1. Fetch project
         p_stmt = select(Project).where(Project.id == project_id)
         p_res = await self.db.execute(p_stmt)
         project = p_res.scalar_one_or_none()
@@ -56,7 +55,6 @@ class AnalysisService:
         await self.db.flush()
 
         try:
-            # 2. Fetch questions and experts
             q_stmt = (
                 select(ResearchQuestion)
                 .where(ResearchQuestion.project_id == project_id)
@@ -68,7 +66,6 @@ class AnalysisService:
             if not questions:
                 raise AnalysisError("No research questions found for project. Please upload an interview guide first.")
 
-            # If transcript_ids are specified, find the experts linked to those transcripts
             if transcript_ids:
                 t_stmt = (
                     select(Transcript)
@@ -83,7 +80,6 @@ class AnalysisService:
                 if not selected_transcripts:
                     raise AnalysisError("None of the selected transcripts were found in this project.")
 
-                # Get unique expert IDs from selected transcripts
                 selected_expert_ids = list({t.expert_id for t in selected_transcripts})
                 e_stmt = select(Expert).where(Expert.id.in_(selected_expert_ids))
                 e_res = await self.db.execute(e_stmt)
@@ -101,12 +97,10 @@ class AnalysisService:
             if not experts:
                 raise AnalysisError("No experts found for project. Please create experts and upload transcripts.")
 
-            # Clear previous answers & evidence for a clean run
             await self.db.execute(delete(Answer).where(Answer.project_id == project_id))
             await self.db.execute(delete(Evidence).where(Evidence.project_id == project_id))
             await self.db.flush()
 
-            # Pre-load utterances — filtered to selected transcripts if specified
             u_query = select(Utterance).join(Transcript).where(Transcript.project_id == project_id)
             if transcript_ids:
                 u_query = u_query.where(Transcript.id.in_(transcript_ids))
@@ -114,10 +108,8 @@ class AnalysisService:
             utterances = list(u_res.scalars().all())
             utterance_lookup = {str(u.id): u for u in utterances}
 
-            # 3. For each Question x Expert: Extract Evidence & Generate Answer
             for q in questions:
                 for exp in experts:
-                    # Run evidence graph
                     ev_initial_state = {
                         "project_id": str(project_id),
                         "question_id": str(q.id),
@@ -135,14 +127,10 @@ class AnalysisService:
                         "error": None,
                     }
 
-                    # We populate candidate utterance texts before graph execution if possible, or within node
-                    # Retrieve candidates
                     ev_final_state = await evidence_graph.ainvoke(ev_initial_state)
 
-                    # If candidate_utterances came from Qdrant without text, populate text from DB
                     classified_records = ev_final_state.get("classified_evidence", [])
                     if not classified_records and ev_final_state.get("candidate_utterances"):
-                        # Re-run classification with full texts populated
                         candidates_with_text = []
                         for c in ev_final_state["candidate_utterances"]:
                             utt_obj = utterance_lookup.get(c["utterance_id"])
@@ -156,7 +144,6 @@ class AnalysisService:
                         re_class = await classify_candidates_node(ev_initial_state)
                         classified_records = re_class.get("classified_evidence", [])
 
-                    # Persist Evidence objects
                     created_evidence_objs: list[Evidence] = []
                     for item in classified_records:
                         u_obj = utterance_lookup.get(item["utterance_id"])
@@ -167,7 +154,7 @@ class AnalysisService:
                                 transcript_id=u_obj.transcript_id,
                                 expert_id=exp.id,
                                 utterance_id=u_obj.id,
-                                quote=u_obj.text,  # Exact quote strictly from DB
+                                quote=u_obj.text,
                                 topic=item.get("topic") or q.category,
                                 relevance_score=item.get("relevance_score", 1.0),
                             )
@@ -178,7 +165,6 @@ class AnalysisService:
                     for ev in created_evidence_objs:
                         await self.db.refresh(ev)
 
-                    # Prepare evidence for answer graph
                     evidence_payload_for_answer = [
                         {
                             "id": str(ev.id),
@@ -190,7 +176,6 @@ class AnalysisService:
                         for ev in created_evidence_objs
                     ]
 
-                    # Run answer graph
                     ans_initial_state = {
                         "project_id": str(project_id),
                         "question_id": str(q.id),
@@ -211,7 +196,6 @@ class AnalysisService:
 
                     ans_final_state = await answer_graph.ainvoke(ans_initial_state)
 
-                    # Persist answer
                     answer_text = ans_final_state.get("answer_text") or "No answer could be generated from available evidence."
                     answer_obj = Answer(
                         project_id=project_id,
@@ -224,7 +208,6 @@ class AnalysisService:
                     await self.db.flush()
                     await self.db.refresh(answer_obj)
 
-                    # Link validated evidence items
                     valid_eids = ans_final_state.get("validated_evidence_ids", [])
                     linked_evidence = [ev for ev in created_evidence_objs if str(ev.id) in valid_eids]
                     if not linked_evidence and created_evidence_objs:
@@ -233,17 +216,14 @@ class AnalysisService:
                     answer_obj.evidence_items = linked_evidence
                     await self.db.flush()
 
-            # 4. Run difference analysis for each question
             for q in questions:
                 await self.difference_service.analyze_differences_for_question(project_id, q)
 
-            # 5. Run project-wide insight generation
             await self.insight_service.generate_project_insights(project_id)
 
             project.status = ProjectStatus.COMPLETED.value
             await self.db.flush()
 
-            # 6. Build and return full analysis response
             return await self.get_project_analysis(project_id)
 
         except Exception as e:

@@ -28,7 +28,6 @@ class ResearchQuestion(Base):
         DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc)
     )
 
-    # Relationships
     project: Mapped["Project"] = relationship("Project", back_populates="questions")
     guide: Mapped["InterviewGuide"] = relationship("InterviewGuide", back_populates="questions")
     evidence: Mapped[list["Evidence"]] = relationship(

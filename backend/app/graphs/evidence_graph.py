@@ -70,10 +70,8 @@ async def classify_candidates_node(state: EvidenceState) -> dict:
         return {"classified_evidence": [], "is_sufficient": False}
 
     try:
-        # Format candidates for LLM prompt
         formatted_list = []
         for c in candidates:
-            # We will populate utterance text during service execution or pass it along
             text_snippet = c.get("text", "")
             ts = f"[{c.get('timestamp_start', 'N/A')} - {c.get('timestamp_end', 'N/A')}]"
             formatted_list.append(
@@ -108,7 +106,7 @@ async def classify_candidates_node(state: EvidenceState) -> dict:
                 classified.append({
                     "utterance_id": str(item.utterance_id),
                     "transcript_id": c_meta.get("transcript_id"),
-                    "quote": c_meta.get("text", ""),  # Exact quote from DB utterance
+                    "quote": c_meta.get("text", ""),
                     "topic": item.topic or state.get("category"),
                     "relevance_score": float(item.relevance_score),
                     "reason": item.reason,

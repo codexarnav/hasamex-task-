@@ -28,7 +28,6 @@ class Difference(Base):
         DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc)
     )
 
-    # Relationships
     project: Mapped["Project"] = relationship("Project", back_populates="differences")
     question: Mapped["ResearchQuestion"] = relationship("ResearchQuestion", back_populates="differences")
     perspectives: Mapped[list["DifferencePerspective"]] = relationship(
@@ -58,7 +57,6 @@ class DifferencePerspective(Base):
     )
     perspective: Mapped[str] = mapped_column(Text, nullable=False)
 
-    # Relationships
     difference: Mapped["Difference"] = relationship("Difference", back_populates="perspectives")
     expert: Mapped["Expert"] = relationship("Expert")
 

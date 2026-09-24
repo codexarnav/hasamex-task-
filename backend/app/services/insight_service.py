@@ -28,14 +28,12 @@ class InsightService:
 
     async def generate_project_insights(self, project_id: UUID) -> list[Insight]:
         """Synthesize project-wide insights based on all answers, differences, and evidence."""
-        # 1. Load project details
         p_stmt = select(Project).where(Project.id == project_id)
         p_res = await self.db.execute(p_stmt)
         project = p_res.scalar_one_or_none()
         if not project:
             raise ProjectNotFoundError(project_id)
 
-        # 2. Load answers, differences, and all project evidence
         a_stmt = (
             select(Answer)
             .where(Answer.project_id == project_id)
@@ -57,7 +55,6 @@ class InsightService:
         all_evidence = list(e_res.scalars().all())
         all_evidence_ids = [str(e.id) for e in all_evidence]
 
-        # 3. Format findings summary for insight prompt
         findings_blocks = []
         for ans in answers:
             q_num = ans.question.question_number if ans.question else "?"
@@ -69,7 +66,6 @@ class InsightService:
             q_num = diff.question.question_number if diff.question else "?"
             findings_blocks.append(f"Cross-Expert Difference Q#{q_num}: {diff.title}\n{diff.description}")
 
-        # 4. Run insight graph
         initial_state = {
             "project_id": str(project_id),
             "project_objective": project.objective or project.name,
@@ -81,7 +77,6 @@ class InsightService:
 
         final_state = await insight_graph.ainvoke(initial_state)
 
-        # 5. Clear old insights for re-runs
         await self.db.execute(delete(Insight).where(Insight.project_id == project_id))
 
         persisted_insights = []
@@ -99,7 +94,6 @@ class InsightService:
             await self.db.flush()
             await self.db.refresh(insight)
 
-            # Link evidence items
             if item.get("evidence_ids"):
                 valid_uuids = [UUID(eid) for eid in item["evidence_ids"]]
                 ev_stmt = select(Evidence).where(Evidence.id.in_(valid_uuids))

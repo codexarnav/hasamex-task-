@@ -33,29 +33,24 @@ import {
 export default function FilesPage({ params }: { params: { projectId: string } }) {
   const { projectId } = params;
 
-  // Data states
   const [project, setProject] = useState<Project | null>(null);
   const [experts, setExperts] = useState<Expert[]>([]);
   const [transcripts, setTranscripts] = useState<Transcript[]>([]);
   const [questions, setQuestions] = useState<ResearchQuestion[]>([]);
   const [guideFileName, setGuideFileName] = useState<string | null>(null);
 
-  // Loading & Error states
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Modal open states
   const [guideModalOpen, setGuideModalOpen] = useState(false);
   const [transcriptModalOpen, setTranscriptModalOpen] = useState(false);
   const [expertModalOpen, setExpertModalOpen] = useState(false);
 
-  // Form states - Guide
   const [selectedGuideFile, setSelectedGuideFile] = useState<File | null>(null);
   const [guideUploading, setGuideUploading] = useState(false);
   const [guideError, setGuideError] = useState<string | null>(null);
   const guideInputRef = useRef<HTMLInputElement>(null);
 
-  // Form states - Expert
   const [expertName, setExpertName] = useState("");
   const [expertRole, setExpertRole] = useState("");
   const [expertMarket, setExpertMarket] = useState("UK");
@@ -63,17 +58,14 @@ export default function FilesPage({ params }: { params: { projectId: string } })
   const [expertSubmitting, setExpertSubmitting] = useState(false);
   const [expertError, setExpertError] = useState<string | null>(null);
 
-  // Form states - Transcript
   const [selectedExpertId, setSelectedExpertId] = useState("");
   const [selectedTranscriptFile, setSelectedTranscriptFile] = useState<File | null>(null);
   const [transcriptUploading, setTranscriptUploading] = useState(false);
   const [transcriptError, setTranscriptError] = useState<string | null>(null);
   const transcriptInputRef = useRef<HTMLInputElement>(null);
 
-  // Transcript selection state
   const [selectedTranscriptIds, setSelectedTranscriptIds] = useState<Set<string>>(new Set());
 
-  // Analysis state
   const [analyzing, setAnalyzing] = useState(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [analysisSuccess, setAnalysisSuccess] = useState<string | null>(null);
@@ -137,7 +129,6 @@ export default function FilesPage({ params }: { params: { projectId: string } })
     fetchData();
   }, [projectId]);
 
-  // Handle Guide Upload
   const handleUploadGuide = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedGuideFile) {
@@ -161,7 +152,6 @@ export default function FilesPage({ params }: { params: { projectId: string } })
     }
   };
 
-  // Handle Expert Registration
   const handleCreateExpert = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!expertName.trim()) {
@@ -191,7 +181,6 @@ export default function FilesPage({ params }: { params: { projectId: string } })
     }
   };
 
-  // Handle Transcript Upload
   const handleUploadTranscript = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedExpertId) {
@@ -222,7 +211,6 @@ export default function FilesPage({ params }: { params: { projectId: string } })
     }
   };
 
-  // Handle Delete Transcript
   const handleDeleteTranscript = async (transcriptId: string) => {
     if (!window.confirm("Are you sure you want to delete this transcript? This will remove its indexed utterances.")) {
       return;
@@ -236,7 +224,6 @@ export default function FilesPage({ params }: { params: { projectId: string } })
     }
   };
 
-  // Handle Trigger Full Analysis
   const handleRunAnalysis = async (transcriptIds?: string[]) => {
     if (questions.length === 0) {
       setAnalysisError("Please upload an interview guide first so questions can be extracted.");
@@ -312,7 +299,7 @@ export default function FilesPage({ params }: { params: { projectId: string } })
         }
       />
 
-      {/* Analysis Notifications */}
+      {}
       {analysisError && (
         <div className="flex items-start gap-2.5 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs">
           <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-rose-600" />
@@ -339,7 +326,7 @@ export default function FilesPage({ params }: { params: { projectId: string } })
         </div>
       )}
 
-      {/* 1. Interview Guide Section */}
+      {}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
@@ -400,7 +387,7 @@ export default function FilesPage({ params }: { params: { projectId: string } })
         )}
       </div>
 
-      {/* 2. Expert Transcripts Section */}
+      {}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
@@ -491,7 +478,7 @@ export default function FilesPage({ params }: { params: { projectId: string } })
         )}
       </div>
 
-      {/* Analysis Pipeline Trigger Card */}
+      {}
       <div className="rounded-xl border border-border bg-slate-50/70 p-6 space-y-3">
         <div className="flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-slate-800" />
@@ -540,7 +527,7 @@ export default function FilesPage({ params }: { params: { projectId: string } })
         </div>
       </div>
 
-      {/* Upload Guide Modal */}
+      {}
       <Modal
         isOpen={guideModalOpen}
         onClose={() => setGuideModalOpen(false)}
@@ -609,7 +596,7 @@ export default function FilesPage({ params }: { params: { projectId: string } })
         </form>
       </Modal>
 
-      {/* Register Expert Modal */}
+      {}
       <Modal
         isOpen={expertModalOpen}
         onClose={() => setExpertModalOpen(false)}
@@ -701,7 +688,7 @@ export default function FilesPage({ params }: { params: { projectId: string } })
         </form>
       </Modal>
 
-      {/* Upload Transcript Modal */}
+      {}
       <Modal
         isOpen={transcriptModalOpen}
         onClose={() => setTranscriptModalOpen(false)}

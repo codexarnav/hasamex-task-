@@ -52,7 +52,6 @@ export default function ProjectOverviewPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Evidence Drawer & Transcript Viewer states
   const [selectedEvidence, setSelectedEvidence] = useState<Evidence | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
@@ -146,7 +145,7 @@ export default function ProjectOverviewPage({
 
   return (
     <div className="space-y-8 pb-12">
-      {/* Project Header */}
+      {}
       <ProjectHeader
         title={project.name}
         description={project.objective || "Qualitative intelligence and grounded transcript analysis"}
@@ -161,7 +160,7 @@ export default function ProjectOverviewPage({
         }
       />
 
-      {/* Metrics Row */}
+      {}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard
           label="Interviewed Experts"
@@ -180,7 +179,7 @@ export default function ProjectOverviewPage({
         />
       </div>
 
-      {/* Research Analysis Progress Breakdown */}
+      {}
       <div className="rounded-xl border border-border bg-card p-6 shadow-xs space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-border">
           <div>
@@ -267,7 +266,7 @@ export default function ProjectOverviewPage({
         </div>
       </div>
 
-      {/* Research Highlights */}
+      {}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
@@ -310,7 +309,7 @@ export default function ProjectOverviewPage({
         )}
       </div>
 
-      {/* Evidence Drawer */}
+      {}
       <EvidenceDrawer
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -318,7 +317,7 @@ export default function ProjectOverviewPage({
         onOpenTranscript={handleOpenTranscript}
       />
 
-      {/* Transcript Viewer Modal */}
+      {}
       {activeTranscript && (
         <TranscriptViewer
           isOpen={viewerOpen}

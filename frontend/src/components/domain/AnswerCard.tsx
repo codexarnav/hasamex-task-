@@ -18,7 +18,7 @@ export function AnswerCard({ answer, expert, onViewEvidence }: AnswerCardProps) 
 
   return (
     <div className="rounded-xl border border-border bg-card p-6 shadow-xs space-y-4">
-      {/* Header: Expert & Market */}
+      {}
       <div className="flex items-start justify-between gap-4 pb-3 border-b border-border">
         <div>
           <div className="flex items-center gap-2">
@@ -41,7 +41,7 @@ export function AnswerCard({ answer, expert, onViewEvidence }: AnswerCardProps) 
         </div>
       </div>
 
-      {/* Synthesized Answer Body */}
+      {}
       <div>
         <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
           Synthesized Answer
@@ -49,7 +49,7 @@ export function AnswerCard({ answer, expert, onViewEvidence }: AnswerCardProps) 
         <p className="text-sm leading-relaxed text-slate-800">{answer.answer_text}</p>
       </div>
 
-      {/* Supporting Evidence Bar */}
+      {}
       <div className="pt-2">
         <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2 flex items-center justify-between">
           <span>Supporting Evidence ({answer.evidence.length})</span>

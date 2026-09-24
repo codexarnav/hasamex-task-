@@ -1,1 +1,0 @@
-# AI schemas module

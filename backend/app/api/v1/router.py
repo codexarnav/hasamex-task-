@@ -14,7 +14,6 @@ from app.api.v1.copilot import router as copilot_router
 
 api_v1_router = APIRouter(prefix="/api/v1")
 
-# Mount sub-routers
 api_v1_router.include_router(health_router)
 api_v1_router.include_router(projects_router)
 api_v1_router.include_router(guides_router)

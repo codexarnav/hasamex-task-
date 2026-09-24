@@ -27,7 +27,6 @@ export default function CopilotPage({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Evidence Drawer & Transcript Viewer states
   const [selectedEvidence, setSelectedEvidence] = useState<Evidence | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
@@ -123,7 +122,7 @@ export default function CopilotPage({
 
   return (
     <div className="flex flex-col h-[calc(100vh-8.5rem)] max-h-[850px] space-y-4">
-      {/* Header */}
+      {}
       <div className="pb-3 border-b border-border shrink-0">
         <div className="flex items-center gap-2">
           <div className="flex h-6 w-6 items-center justify-center rounded bg-slate-900 text-white">
@@ -138,7 +137,7 @@ export default function CopilotPage({
         </p>
       </div>
 
-      {/* Chat Messages Stream */}
+      {}
       <div className="flex-1 overflow-y-auto pr-1 space-y-4">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center p-8">
@@ -190,7 +189,7 @@ export default function CopilotPage({
         )}
       </div>
 
-      {/* Suggested Prompts Pill Bar */}
+      {}
       {messages.length > 0 && (
         <div className="flex items-center gap-2 overflow-x-auto py-1 shrink-0 scrollbar-none">
           <span className="text-[11px] text-muted-foreground whitespace-nowrap font-medium flex items-center gap-1">
@@ -210,7 +209,7 @@ export default function CopilotPage({
         </div>
       )}
 
-      {/* Input Form */}
+      {}
       <form onSubmit={handleSend} className="flex items-center gap-2 shrink-0 pt-2 border-t border-border">
         <Input
           placeholder="Ask any question about your interview transcripts..."
@@ -234,7 +233,7 @@ export default function CopilotPage({
         </Button>
       </form>
 
-      {/* Evidence Drawer */}
+      {}
       <EvidenceDrawer
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -242,7 +241,7 @@ export default function CopilotPage({
         onOpenTranscript={handleOpenTranscript}
       />
 
-      {/* Transcript Viewer Modal */}
+      {}
       {activeTranscript && (
         <TranscriptViewer
           isOpen={viewerOpen}

@@ -35,19 +35,15 @@ class GuideService:
         content: bytes,
     ) -> tuple[InterviewGuide, list[ResearchQuestion]]:
         """Process an uploaded guide: save, extract text, call Gemini to extract questions, and persist."""
-        # Check project exists
         p_stmt = select(Project).where(Project.id == project_id)
         p_res = await self.db.execute(p_stmt)
         if not p_res.scalar_one_or_none():
             raise ProjectNotFoundError(project_id)
 
-        # 1. Save file locally
         rel_path = local_storage.save(project_id, filename, content)
 
-        # 2. Extract readable text
         extracted_text = extract_guide_text(content, filename)
 
-        # 3. Create or update InterviewGuide record
         g_stmt = select(InterviewGuide).where(InterviewGuide.project_id == project_id)
         g_res = await self.db.execute(g_stmt)
         guide = g_res.scalar_one_or_none()
@@ -55,7 +51,6 @@ class GuideService:
         if guide:
             guide.source_file = rel_path
             guide.status = GuideStatus.PROCESSING.value
-            # Remove existing questions
             await self.db.execute(
                 delete(ResearchQuestion).where(ResearchQuestion.guide_id == guide.id)
             )
@@ -70,7 +65,6 @@ class GuideService:
         await self.db.flush()
         await self.db.refresh(guide)
 
-        # 4. Call Gemini structured extraction
         try:
             prompt = GUIDE_EXTRACTION_USER_PROMPT.format(guide_text=extracted_text)
             gemini = get_gemini_client()
@@ -80,7 +74,6 @@ class GuideService:
                 system_prompt=GUIDE_EXTRACTION_SYSTEM_PROMPT,
             )
 
-            # 5. Persist extracted research questions
             questions = []
             for q in result.questions:
                 rq = ResearchQuestion(

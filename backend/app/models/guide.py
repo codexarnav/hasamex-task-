@@ -34,7 +34,6 @@ class InterviewGuide(Base):
         onupdate=lambda: datetime.now(timezone.utc),
     )
 
-    # Relationships
     project: Mapped["Project"] = relationship("Project", back_populates="guide")
     questions: Mapped[list["ResearchQuestion"]] = relationship(
         "ResearchQuestion", back_populates="guide", cascade="all, delete-orphan"

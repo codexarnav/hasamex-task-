@@ -33,7 +33,6 @@ def extract_pdf_text(content: bytes) -> str:
         extra={"operation": "pdf_extract"},
     )
 
-    # --- Tier 1: PyMuPDF (fitz) ---
     text = _extract_pymupdf(content)
     if text and text.strip():
         logger.info(
@@ -42,7 +41,6 @@ def extract_pdf_text(content: bytes) -> str:
         )
         return text
 
-    # --- Tier 2: pdfplumber ---
     text = _extract_pdfplumber(content)
     if text and text.strip():
         logger.info(
@@ -56,7 +54,6 @@ def extract_pdf_text(content: bytes) -> str:
         extra={"operation": "pdf_extract"},
     )
 
-    # --- Tier 3: Tesseract OCR ---
     text = _extract_tesseract_ocr(content)
     if text and text.strip():
         logger.info(
@@ -65,7 +62,6 @@ def extract_pdf_text(content: bytes) -> str:
         )
         return text
 
-    # --- Tier 4: Gemini Vision OCR ---
     text = _extract_gemini_vision(content)
     if text and text.strip():
         logger.info(
@@ -122,7 +118,6 @@ def _extract_tesseract_ocr(content: bytes) -> str:
         import pytesseract
         from PIL import Image
 
-        # Auto-configure tesseract path on Windows if standard binary exists
         common_paths = [
             r"C:\Program Files\Tesseract-OCR\tesseract.exe",
             r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe",
@@ -136,7 +131,7 @@ def _extract_tesseract_ocr(content: bytes) -> str:
         doc = pymupdf.open(stream=content, filetype="pdf")
         text_parts = []
         for page in doc:
-            zoom = 300 / 72  # 300 DPI
+            zoom = 300 / 72
             mat = pymupdf.Matrix(zoom, zoom)
             pix = page.get_pixmap(matrix=mat)
             img = Image.open(io.BytesIO(pix.tobytes("png")))
@@ -167,7 +162,7 @@ def _extract_gemini_vision(content: bytes) -> str:
 
         image_parts = []
         for page in doc:
-            zoom = 2.0  # ~144 DPI
+            zoom = 2.0
             mat = pymupdf.Matrix(zoom, zoom)
             pix = page.get_pixmap(matrix=mat)
             img_bytes = pix.tobytes("png")

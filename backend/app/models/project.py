@@ -31,7 +31,6 @@ class Project(Base):
         onupdate=lambda: datetime.now(timezone.utc),
     )
 
-    # Relationships
     guide: Mapped["InterviewGuide | None"] = relationship(
         "InterviewGuide", back_populates="project", uselist=False, cascade="all, delete-orphan"
     )

@@ -31,7 +31,6 @@ def extract_guide_text(file_content: bytes, filename: str) -> str:
     elif suffix in (".md", ".markdown"):
         return _extract_text(file_content)
     else:
-        # Try text extraction as fallback
         logger.warning(
             f"Unknown guide format '{suffix}', attempting text extraction",
             extra={"operation": "guide_parse"},

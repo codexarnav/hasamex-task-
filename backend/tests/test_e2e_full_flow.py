@@ -9,7 +9,6 @@ import pytest
 from httpx import AsyncClient, ASGITransport
 from app.main import app
 
-# Sample research case data
 SAMPLE_GUIDE = """# European Medical Device Adoption Guide
 
 Discussion Areas:
@@ -52,13 +51,11 @@ Dr. Pierre Dubois:
 async def test_full_pipeline_end_to_end():
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
-        # 1. Health check
         health_resp = await client.get("/api/v1/health")
         assert health_resp.status_code == 200
         assert health_resp.json()["status"] == "ok"
         print("\n[Step 1] Health check passed.")
 
-        # 2. Create Project
         proj_resp = await client.post(
             "/api/v1/projects",
             json={
@@ -70,7 +67,6 @@ async def test_full_pipeline_end_to_end():
         project_id = proj_resp.json()["id"]
         print(f"[Step 2] Project created: {project_id}")
 
-        # 3. Upload Guide and Extract Questions
         guide_file = io.BytesIO(SAMPLE_GUIDE.encode("utf-8"))
         guide_resp = await client.post(
             f"/api/v1/projects/{project_id}/guide",
@@ -81,7 +77,6 @@ async def test_full_pipeline_end_to_end():
         assert len(questions_data["questions"]) >= 2
         print(f"[Step 3] Guide uploaded, extracted {len(questions_data['questions'])} research questions dynamically.")
 
-        # 4. Register 3 Experts
         exp1_resp = await client.post(
             f"/api/v1/projects/{project_id}/experts",
             json={
@@ -119,7 +114,6 @@ async def test_full_pipeline_end_to_end():
         exp3_id = exp3_resp.json()["id"]
         print(f"[Step 4] Registered 3 experts: UK ({exp1_id}), Germany ({exp2_id}), France ({exp3_id}).")
 
-        # 5. Upload 3 Transcripts (Parsing, Embedding, and Qdrant Indexing)
         uk_file = io.BytesIO(UK_TRANSCRIPT.encode("utf-8"))
         t1_resp = await client.post(
             f"/api/v1/projects/{project_id}/transcripts",
@@ -148,7 +142,6 @@ async def test_full_pipeline_end_to_end():
         assert t3_resp.json()["status"] == "ready"
         print("[Step 5] Uploaded and indexed 3 transcripts in Qdrant successfully.")
 
-        # 6. Verify Utterances
         t1_id = t1_resp.json()["id"]
         utts_resp = await client.get(f"/api/v1/transcripts/{t1_id}/utterances")
         assert utts_resp.status_code == 200
@@ -156,7 +149,6 @@ async def test_full_pipeline_end_to_end():
         assert len(utts) >= 2
         print(f"[Step 6] Utterances verified for transcript {t1_id}: {len(utts)} utterances.")
 
-        # 7. Trigger Full Qualitative Analysis Pipeline
         print("[Step 7] Triggering full qualitative analysis pipeline (LangGraph workflows)...")
         analysis_resp = await client.post(f"/api/v1/projects/{project_id}/analysis")
         assert analysis_resp.status_code == 200
@@ -165,28 +157,24 @@ async def test_full_pipeline_end_to_end():
         assert len(analysis_data["questions"]) >= 2
         print(f"[Step 7] Analysis pipeline completed. Synthesized answers for {len(analysis_data['questions'])} questions.")
 
-        # 8. Verify Evidence
         ev_resp = await client.get(f"/api/v1/projects/{project_id}/evidence")
         assert ev_resp.status_code == 200
         evidence_list = ev_resp.json()["evidence"]
         assert len(evidence_list) > 0
         print(f"[Step 8] Evidence verified: {len(evidence_list)} grounded evidence items with timestamps.")
 
-        # 9. Verify Differences
         diff_resp = await client.get(f"/api/v1/projects/{project_id}/differences")
         assert diff_resp.status_code == 200
         differences = diff_resp.json()["differences"]
         assert len(differences) > 0
         print(f"[Step 9] Differences verified: {len(differences)} cross-expert differences synthesized.")
 
-        # 10. Verify Insights
         ins_resp = await client.get(f"/api/v1/projects/{project_id}/insights")
         assert ins_resp.status_code == 200
         insights = ins_resp.json()["insights"]
         assert len(insights) > 0
         print(f"[Step 10] Insights verified: {len(insights)} strategic insights synthesized.")
 
-        # 11. Query Research Copilot
         copilot_resp = await client.post(
             f"/api/v1/projects/{project_id}/ask",
             json={"question": "What did the UK expert say about capital purchasing in NHS?"},

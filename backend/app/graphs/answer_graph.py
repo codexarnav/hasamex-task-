@@ -26,7 +26,7 @@ class AnswerState(TypedDict):
     expert_name: str
     expert_role: str | None
     expert_market: str | None
-    available_evidence: list[dict] # {id, quote, topic, timestamp_start, timestamp_end}
+    available_evidence: list[dict]
     answer_text: str | None
     validated_evidence_ids: list[str]
     is_valid: bool
@@ -96,13 +96,11 @@ def validate_evidence_refs_node(state: AnswerState) -> dict:
     returned_ids = set(state.get("validated_evidence_ids", []))
 
     if not returned_ids and state.get("available_evidence"):
-        # If model returned no IDs but evidence was available, fallback to all available evidence
         return {
             "validated_evidence_ids": list(available_ids),
             "is_valid": True,
         }
 
-    # Verify no hallucinated evidence IDs
     invalid_ids = returned_ids - available_ids
     if invalid_ids:
         logger.warning(
@@ -110,7 +108,6 @@ def validate_evidence_refs_node(state: AnswerState) -> dict:
             extra={"operation": "validate_evidence_refs"}
         )
         valid_subset = list(returned_ids & available_ids)
-        # If we have at least one valid reference, retain it
         if valid_subset:
             return {
                 "validated_evidence_ids": valid_subset,

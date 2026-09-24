@@ -29,7 +29,6 @@ class Insight(Base):
         DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc)
     )
 
-    # Relationships
     project: Mapped["Project"] = relationship("Project", back_populates="insights")
     question: Mapped["ResearchQuestion | None"] = relationship("ResearchQuestion")
     evidence_items: Mapped[list["Evidence"]] = relationship(

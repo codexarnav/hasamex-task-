@@ -23,7 +23,6 @@ export default function ExpertsPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Transcript viewer modal
   const [viewerOpen, setViewerOpen] = useState(false);
   const [selectedTranscript, setSelectedTranscript] = useState<Transcript | null>(null);
   const [selectedExpertName, setSelectedExpertName] = useState("");

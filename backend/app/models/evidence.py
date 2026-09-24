@@ -8,7 +8,6 @@ from sqlalchemy.dialects.postgresql import UUID
 
 from app.db.base import Base
 
-# Many-to-many: Answer <-> Evidence
 answer_evidence = Table(
     "answer_evidence",
     Base.metadata,
@@ -16,7 +15,6 @@ answer_evidence = Table(
     Column("evidence_id", UUID(as_uuid=True), ForeignKey("evidence.id", ondelete="CASCADE"), primary_key=True),
 )
 
-# Many-to-many: Difference <-> Evidence
 difference_evidence = Table(
     "difference_evidence",
     Base.metadata,
@@ -24,7 +22,6 @@ difference_evidence = Table(
     Column("evidence_id", UUID(as_uuid=True), ForeignKey("evidence.id", ondelete="CASCADE"), primary_key=True),
 )
 
-# Many-to-many: Insight <-> Evidence
 insight_evidence = Table(
     "insight_evidence",
     Base.metadata,
@@ -61,7 +58,6 @@ class Evidence(Base):
         DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc)
     )
 
-    # Relationships
     project: Mapped["Project"] = relationship("Project", back_populates="evidence")
     question: Mapped["ResearchQuestion"] = relationship("ResearchQuestion", back_populates="evidence")
     transcript: Mapped["Transcript"] = relationship("Transcript", back_populates="evidence")

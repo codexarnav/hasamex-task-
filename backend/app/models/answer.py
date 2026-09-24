@@ -40,7 +40,6 @@ class Answer(Base):
         onupdate=lambda: datetime.now(timezone.utc),
     )
 
-    # Relationships
     project: Mapped["Project"] = relationship("Project", back_populates="answers")
     question: Mapped["ResearchQuestion"] = relationship("ResearchQuestion", back_populates="answers")
     expert: Mapped["Expert"] = relationship("Expert", back_populates="answers")

@@ -20,11 +20,8 @@ class LocalStorage:
 
     def _sanitize_filename(self, filename: str) -> str:
         """Sanitize a filename to prevent path traversal and invalid chars."""
-        # Strip directory components
         filename = os.path.basename(filename)
-        # Remove potentially dangerous characters
         filename = re.sub(r'[^\w\s\-.]', '', filename)
-        # Ensure non-empty
         if not filename:
             filename = f"file_{uuid.uuid4().hex[:8]}"
         return filename
@@ -44,7 +41,6 @@ class LocalStorage:
         project_dir.mkdir(parents=True, exist_ok=True)
 
         file_path = project_dir / safe_filename
-        # If file exists, add a unique suffix
         if file_path.exists():
             stem = file_path.stem
             suffix = file_path.suffix
@@ -68,7 +64,6 @@ class LocalStorage:
     def read(self, relative_path: str) -> bytes:
         """Read file content by relative path."""
         file_path = self.base_dir / relative_path
-        # Prevent path traversal
         try:
             file_path = file_path.resolve()
             base_resolved = self.base_dir.resolve()
@@ -96,7 +91,6 @@ class LocalStorage:
         try:
             return content.decode("utf-8")
         except UnicodeDecodeError:
-            # Try latin-1 as fallback
             return content.decode("latin-1")
 
     def delete(self, relative_path: str) -> None:
@@ -116,5 +110,4 @@ class LocalStorage:
             raise FileStorageError(message="Failed to delete file", detail=str(e))
 
 
-# Singleton
 local_storage = LocalStorage()

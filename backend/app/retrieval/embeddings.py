@@ -83,7 +83,6 @@ class GeminiEmbeddingService(EmbeddingService):
             )
 
 
-# Singleton
 _embedding_service: EmbeddingService | None = None
 
 

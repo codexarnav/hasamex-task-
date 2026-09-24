@@ -20,7 +20,7 @@ class InsightState(TypedDict):
     project_objective: str
     project_findings_summary: str
     available_evidence_ids: list[str]
-    generated_insights: list[dict] # [{title, summary, confidence, question_id, evidence_ids}]
+    generated_insights: list[dict]
     error: str | None
 
 

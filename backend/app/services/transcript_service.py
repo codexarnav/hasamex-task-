@@ -35,7 +35,6 @@ class TranscriptService:
         content: bytes,
     ) -> Transcript:
         """Process an uploaded transcript: parse utterances, persist to DB, embed, and index in Qdrant."""
-        # 1. Validate project & expert
         p_stmt = select(Project).where(Project.id == project_id)
         p_res = await self.db.execute(p_stmt)
         if not p_res.scalar_one_or_none():
@@ -47,10 +46,8 @@ class TranscriptService:
         if not expert:
             raise ExpertNotFoundError(expert_id)
 
-        # 2. Save file
         rel_path = local_storage.save(project_id, filename, content)
 
-        # 3. Create Transcript record
         transcript = Transcript(
             project_id=project_id,
             expert_id=expert_id,
@@ -63,11 +60,9 @@ class TranscriptService:
         await self.db.refresh(transcript)
 
         try:
-            # 4. Parse text into structured utterances
             text = _extract_text_from_content(content, filename)
             parsed = parse_transcript(text)
 
-            # 5. Persist Utterances in PostgreSQL
             utterance_objs: list[Utterance] = []
             for u in parsed.utterances:
                 utt = Utterance(
@@ -84,18 +79,15 @@ class TranscriptService:
 
             await self.db.flush()
 
-            # Refresh to ensure UUIDs are populated
             for utt in utterance_objs:
                 await self.db.refresh(utt)
 
             transcript.status = TranscriptStatus.EMBEDDING.value
             await self.db.flush()
 
-            # 6. Generate embeddings and index in Qdrant
             embedding_service = get_embedding_service()
             qdrant_repo = get_qdrant_repository()
 
-            # Ensure Qdrant collection is ready
             await qdrant_repo.init_collection()
 
             texts_to_embed = [u.text for u in utterance_objs]
@@ -177,21 +169,18 @@ class TranscriptService:
         """Delete a transcript, its utterances, vector embeddings in Qdrant, and raw stored file."""
         transcript = await self.get_transcript(transcript_id)
 
-        # 1. Delete vector embeddings in Qdrant
         try:
             qdrant_repo = get_qdrant_repository()
             await qdrant_repo.delete_transcript_vectors(transcript.project_id, transcript_id)
         except Exception as e:
             logger.warning(f"Could not delete Qdrant vectors for transcript {transcript_id}: {e}")
 
-        # 2. Delete stored file on disk
         if transcript.file_path:
             try:
                 local_storage.delete(transcript.file_path)
             except Exception as e:
                 logger.warning(f"Could not delete local file for transcript {transcript_id}: {e}")
 
-        # 3. Delete transcript record from DB (foreign keys will cascade to Utterances & Evidence)
         await self.db.delete(transcript)
         await self.db.flush()
 
@@ -211,7 +200,6 @@ def _extract_text_from_content(content: bytes, filename: str) -> str:
     if suffix == ".pdf":
         return extract_pdf_text(content)
     else:
-        # Text-based formats (.txt, .md, .csv, etc.)
         try:
             return content.decode("utf-8")
         except UnicodeDecodeError:

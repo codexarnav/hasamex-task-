@@ -17,29 +17,23 @@ from app.core.logging import get_logger
 
 logger = get_logger("parsers.transcript")
 
-# Patterns for timestamp detection
-# Format: "HH:MM:SS - HH:MM:SS" or "MM:SS - MM:SS"
 TIMESTAMP_RANGE_PATTERN = re.compile(
     r'(\d{1,2}:\d{2}(?::\d{2})?)\s*[-–—]\s*(\d{1,2}:\d{2}(?::\d{2})?)'
 )
 
-# Format: "[HH:MM:SS]", "(HH:MM:SS)", or bare "HH:MM:SS" / "MM:SS" on its own line
 SINGLE_TIMESTAMP_PATTERN = re.compile(
     r'^[\[\(]?(\d{1,2}:\d{2}(?::\d{2})?)[\]\)]?$'
 )
 
-# Non-speaker metadata prefixes to ignore during dialogue extraction
 NON_SPEAKER_PREFIXES = {
     "role", "market", "date", "topic", "project", "interviewer note", "note", "title", "expert"
 }
 
-# Speaker detection - name followed by colon
 SPEAKER_PATTERN = re.compile(
     r'^([A-Z][A-Za-z\s\.\-\,\']+(?:Dr\.|Mr\.|Ms\.|Mrs\.|Prof\.)?[A-Za-z\s\.\-\,\']*)\s*:\s*$',
     re.MULTILINE,
 )
 
-# Simpler speaker pattern: "Name:" on a line, possibly with text after
 SPEAKER_INLINE_PATTERN = re.compile(
     r'^([A-Z][A-Za-z\s\.\-\,\']{2,50}):\s*(.*)',
     re.MULTILINE,
@@ -83,7 +77,6 @@ def parse_transcript(text: str) -> ParsedTranscript:
             detail="Transcript file contains no text",
         )
 
-    # Try different parsing strategies in order
     result = _parse_timestamp_range_format(text)
     if result and result.utterances:
         logger.info(
@@ -108,7 +101,6 @@ def parse_transcript(text: str) -> ParsedTranscript:
         )
         return result
 
-    # Fallback: treat entire text as a single utterance
     logger.warning(
         "Could not detect structured format, using fallback",
         extra={"operation": "transcript_parse"},
@@ -152,7 +144,6 @@ def _parse_timestamp_range_format(text: str) -> ParsedTranscript | None:
         nonlocal sequence
         if current_speaker and current_text_lines:
             text_content = ' '.join(current_text_lines).strip()
-            # Remove surrounding quotes
             text_content = text_content.strip('"').strip("'").strip('"').strip('"').strip()
             if text_content:
                 utterances.append(ParsedUtterance(
@@ -169,10 +160,8 @@ def _parse_timestamp_range_format(text: str) -> ParsedTranscript | None:
         if not stripped:
             continue
 
-        # Check for timestamp range
         ts_match = TIMESTAMP_RANGE_PATTERN.match(stripped)
         if ts_match:
-            # Flush previous utterance
             flush()
             current_ts_start = ts_match.group(1)
             current_ts_end = ts_match.group(2)
@@ -181,7 +170,6 @@ def _parse_timestamp_range_format(text: str) -> ParsedTranscript | None:
             has_timestamps = True
             continue
 
-        # Check for single timestamp
         single_ts = SINGLE_TIMESTAMP_PATTERN.match(stripped)
         if single_ts:
             flush()
@@ -192,12 +180,10 @@ def _parse_timestamp_range_format(text: str) -> ParsedTranscript | None:
             has_timestamps = True
             continue
 
-        # Check for speaker line (name followed by colon, nothing else)
         speaker_match = re.match(r'^([A-Z][A-Za-z\s\.\-\,\']{2,60}):\s*$', stripped)
         if speaker_match:
             if current_speaker and current_text_lines:
                 flush()
-                # Keep timestamps if this speaker block had no timestamp
                 if not has_timestamps:
                     current_ts_start = None
                     current_ts_end = None
@@ -206,12 +192,9 @@ def _parse_timestamp_range_format(text: str) -> ParsedTranscript | None:
             current_text_lines = []
             continue
 
-        # Otherwise it's text content
         if current_speaker is not None:
             current_text_lines.append(stripped)
         elif current_ts_start is not None:
-            # We have a timestamp but no speaker identified yet
-            # Check if this line is "Speaker: text"
             inline_match = re.match(r'^([A-Z][A-Za-z\s\.\-\,\']{2,50}):\s*(.+)', stripped)
             if inline_match:
                 current_speaker = inline_match.group(1).strip()
@@ -221,7 +204,6 @@ def _parse_timestamp_range_format(text: str) -> ParsedTranscript | None:
                 current_speaker = "Unknown"
                 current_text_lines.append(stripped)
 
-    # Flush last utterance
     flush()
 
     if not utterances:
@@ -268,7 +250,6 @@ def _parse_speaker_block_format(text: str) -> ParsedTranscript | None:
         if not stripped:
             continue
 
-        # Check for timestamp
         ts_match = TIMESTAMP_RANGE_PATTERN.match(stripped)
         if ts_match:
             current_ts_start = ts_match.group(1)
@@ -283,7 +264,6 @@ def _parse_speaker_block_format(text: str) -> ParsedTranscript | None:
             has_timestamps = True
             continue
 
-        # Check for speaker line
         speaker_match = re.match(r'^([A-Z][A-Za-z\s\.\-\,\']{2,60}):\s*$', stripped)
         if speaker_match:
             flush()
@@ -292,7 +272,6 @@ def _parse_speaker_block_format(text: str) -> ParsedTranscript | None:
             current_text_lines = []
             continue
 
-        # Text content
         if current_speaker:
             current_text_lines.append(stripped)
 
@@ -324,7 +303,6 @@ def _parse_inline_speaker_format(text: str) -> ParsedTranscript | None:
         if not stripped:
             continue
 
-        # Check for timestamp
         ts_match = TIMESTAMP_RANGE_PATTERN.match(stripped)
         if ts_match:
             current_ts_start = ts_match.group(1)
@@ -339,7 +317,6 @@ def _parse_inline_speaker_format(text: str) -> ParsedTranscript | None:
             has_timestamps = True
             continue
 
-        # Check for inline speaker
         inline_match = re.match(r'^([A-Z][A-Za-z\s\.\-\,\']{2,50}):\s*(.+)', stripped)
         if inline_match:
             speaker = inline_match.group(1).strip()

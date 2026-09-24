@@ -38,7 +38,6 @@ class Transcript(Base):
         onupdate=lambda: datetime.now(timezone.utc),
     )
 
-    # Relationships
     project: Mapped["Project"] = relationship("Project", back_populates="transcripts")
     expert: Mapped["Expert"] = relationship("Expert", back_populates="transcripts")
     utterances: Mapped[list["Utterance"]] = relationship(

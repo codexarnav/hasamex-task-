@@ -36,7 +36,7 @@ export default function ProjectListPage() {
   return (
     <div className="min-h-screen bg-background p-6 sm:p-10 lg:p-12">
       <div className="mx-auto max-w-4xl space-y-8">
-        {/* Brand & Header Bar */}
+        {}
         <div className="flex items-center justify-between pb-6 border-b border-border">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
@@ -63,7 +63,7 @@ export default function ProjectListPage() {
           </Link>
         </div>
 
-        {/* Content Section */}
+        {}
         {loading ? (
           <LoadingState message="Connecting to InsightOS API..." />
         ) : error ? (

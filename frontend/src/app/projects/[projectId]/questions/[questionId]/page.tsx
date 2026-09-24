@@ -33,7 +33,6 @@ export default function QuestionAnalysisPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Evidence Drawer & Transcript Viewer states
   const [selectedEvidence, setSelectedEvidence] = useState<Evidence | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
@@ -120,7 +119,7 @@ export default function QuestionAnalysisPage({
 
   return (
     <div className="space-y-8 pb-12">
-      {/* Back Link */}
+      {}
       <Link
         href={`/projects/${projectId}/questions`}
         className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
@@ -129,7 +128,7 @@ export default function QuestionAnalysisPage({
         <span>Back to all questions</span>
       </Link>
 
-      {/* Question Header */}
+      {}
       {question ? (
         <div className="rounded-xl border border-border bg-card p-6 shadow-xs space-y-3">
           <div className="flex items-center gap-2">
@@ -160,7 +159,7 @@ export default function QuestionAnalysisPage({
         </div>
       )}
 
-      {/* Expert Perspectives Section */}
+      {}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-bold tracking-tight text-foreground">
@@ -204,7 +203,7 @@ export default function QuestionAnalysisPage({
         )}
       </div>
 
-      {/* Evidence Drawer */}
+      {}
       <EvidenceDrawer
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -212,7 +211,7 @@ export default function QuestionAnalysisPage({
         onOpenTranscript={handleOpenTranscript}
       />
 
-      {/* Transcript Viewer Modal */}
+      {}
       {activeTranscript && (
         <TranscriptViewer
           isOpen={viewerOpen}

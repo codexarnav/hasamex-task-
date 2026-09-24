@@ -15,7 +15,6 @@ class StructuredFormatter(logging.Formatter):
             "logger": record.name,
             "message": record.getMessage(),
         }
-        # Add extra structured fields
         for key in ("operation", "project_id", "question_id", "expert_id",
                      "transcript_id", "duration_ms", "status", "error", "detail"):
             value = getattr(record, key, None)
@@ -35,7 +34,6 @@ def setup_logging(debug: bool = False) -> None:
     root_logger.setLevel(level)
     root_logger.handlers = [handler]
 
-    # Reduce noise from third-party libraries
     logging.getLogger("uvicorn").setLevel(logging.WARNING)
     logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
     logging.getLogger("httpcore").setLevel(logging.WARNING)

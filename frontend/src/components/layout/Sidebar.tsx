@@ -89,7 +89,7 @@ export function Sidebar({ projectId, className }: SidebarProps) {
         className
       )}
     >
-      {/* Brand Header */}
+      {}
       <div className="flex h-14 items-center justify-between border-b border-border px-4">
         <Link href="/" className="flex items-center gap-2 text-foreground font-semibold tracking-tight">
           <div className="flex h-6 w-6 items-center justify-center rounded bg-slate-900 text-white text-xs font-bold">
@@ -107,7 +107,7 @@ export function Sidebar({ projectId, className }: SidebarProps) {
         </Link>
       </div>
 
-      {/* Navigation Links */}
+      {}
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
         <div>
           <div className="px-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
@@ -191,7 +191,7 @@ export function Sidebar({ projectId, className }: SidebarProps) {
         </div>
       </div>
 
-      {/* Footer */}
+      {}
       <div className="border-t border-border p-3">
         <div className="px-2 py-1.5 rounded bg-slate-50 border border-slate-200/60">
           <div className="text-[11px] font-medium text-slate-800">InsightOS V1</div>

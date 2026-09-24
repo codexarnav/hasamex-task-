@@ -17,7 +17,6 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    # 1. Projects
     op.create_table(
         'projects',
         sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True),
@@ -29,7 +28,6 @@ def upgrade() -> None:
     )
     op.create_index('ix_projects_status', 'projects', ['status'])
 
-    # 2. Interview Guides
     op.create_table(
         'interview_guides',
         sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True),
@@ -41,7 +39,6 @@ def upgrade() -> None:
     )
     op.create_index('ix_interview_guides_project_id', 'interview_guides', ['project_id'])
 
-    # 3. Research Questions
     op.create_table(
         'research_questions',
         sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True),
@@ -55,7 +52,6 @@ def upgrade() -> None:
     op.create_index('ix_research_questions_project_id', 'research_questions', ['project_id'])
     op.create_index('ix_research_questions_guide_id', 'research_questions', ['guide_id'])
 
-    # 4. Experts
     op.create_table(
         'experts',
         sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True),
@@ -68,7 +64,6 @@ def upgrade() -> None:
     )
     op.create_index('ix_experts_project_id', 'experts', ['project_id'])
 
-    # 5. Transcripts
     op.create_table(
         'transcripts',
         sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True),
@@ -84,7 +79,6 @@ def upgrade() -> None:
     op.create_index('ix_transcripts_project_id', 'transcripts', ['project_id'])
     op.create_index('ix_transcripts_expert_id', 'transcripts', ['expert_id'])
 
-    # 6. Utterances
     op.create_table(
         'utterances',
         sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True),
@@ -101,7 +95,6 @@ def upgrade() -> None:
     op.create_index('ix_utterances_expert_id', 'utterances', ['expert_id'])
     op.create_index('ix_utterances_sequence', 'utterances', ['transcript_id', 'sequence'])
 
-    # 7. Evidence
     op.create_table(
         'evidence',
         sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True),
@@ -121,7 +114,6 @@ def upgrade() -> None:
     op.create_index('ix_evidence_transcript_id', 'evidence', ['transcript_id'])
     op.create_index('ix_evidence_utterance_id', 'evidence', ['utterance_id'])
 
-    # 8. Answers
     op.create_table(
         'answers',
         sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True),
@@ -137,14 +129,12 @@ def upgrade() -> None:
     op.create_index('ix_answers_question_id', 'answers', ['question_id'])
     op.create_index('ix_answers_expert_id', 'answers', ['expert_id'])
 
-    # 9. Answer <-> Evidence association table
     op.create_table(
         'answer_evidence',
         sa.Column('answer_id', postgresql.UUID(as_uuid=True), sa.ForeignKey('answers.id', ondelete='CASCADE'), primary_key=True),
         sa.Column('evidence_id', postgresql.UUID(as_uuid=True), sa.ForeignKey('evidence.id', ondelete='CASCADE'), primary_key=True),
     )
 
-    # 10. Differences
     op.create_table(
         'differences',
         sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True),
@@ -157,7 +147,6 @@ def upgrade() -> None:
     op.create_index('ix_differences_project_id', 'differences', ['project_id'])
     op.create_index('ix_differences_question_id', 'differences', ['question_id'])
 
-    # 11. Difference Perspectives
     op.create_table(
         'difference_perspectives',
         sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True),
@@ -167,14 +156,12 @@ def upgrade() -> None:
     )
     op.create_index('ix_difference_perspectives_difference_id', 'difference_perspectives', ['difference_id'])
 
-    # 12. Difference <-> Evidence association table
     op.create_table(
         'difference_evidence',
         sa.Column('difference_id', postgresql.UUID(as_uuid=True), sa.ForeignKey('differences.id', ondelete='CASCADE'), primary_key=True),
         sa.Column('evidence_id', postgresql.UUID(as_uuid=True), sa.ForeignKey('evidence.id', ondelete='CASCADE'), primary_key=True),
     )
 
-    # 13. Insights
     op.create_table(
         'insights',
         sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True),
@@ -188,7 +175,6 @@ def upgrade() -> None:
     op.create_index('ix_insights_project_id', 'insights', ['project_id'])
     op.create_index('ix_insights_question_id', 'insights', ['question_id'])
 
-    # 14. Insight <-> Evidence association table
     op.create_table(
         'insight_evidence',
         sa.Column('insight_id', postgresql.UUID(as_uuid=True), sa.ForeignKey('insights.id', ondelete='CASCADE'), primary_key=True),

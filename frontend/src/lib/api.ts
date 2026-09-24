@@ -46,13 +46,12 @@ async function handleResponse<T>(response: Response): Promise<T> {
 }
 
 export const api = {
-  // Health
+
   async getHealth(): Promise<{ status: string }> {
     const res = await fetch(`${API_BASE_URL}/health`);
     return handleResponse<{ status: string }>(res);
   },
 
-  // Projects
   async getProjects(skip = 0, limit = 50): Promise<{ projects: Project[]; total: number }> {
     const res = await fetch(`${API_BASE_URL}/projects?skip=${skip}&limit=${limit}`, {
       cache: "no-store",
@@ -78,7 +77,6 @@ export const api = {
     return handleResponse<Project>(res);
   },
 
-  // Interview Guide & Questions
   async uploadGuide(
     projectId: string,
     file: File
@@ -86,7 +84,6 @@ export const api = {
     const formData = new FormData();
     formData.append("file", file);
 
-    // Note: Do NOT set Content-Type header so browser computes the boundary automatically
     const res = await fetch(`${API_BASE_URL}/projects/${projectId}/guide`, {
       method: "POST",
       body: formData,
@@ -103,7 +100,6 @@ export const api = {
     return handleResponse<{ questions: ResearchQuestion[]; total: number }>(res);
   },
 
-  // Experts
   async getExperts(projectId: string): Promise<{ experts: Expert[]; total: number }> {
     const res = await fetch(`${API_BASE_URL}/projects/${projectId}/experts`, {
       cache: "no-store",
@@ -130,7 +126,6 @@ export const api = {
     return handleResponse<Expert>(res);
   },
 
-  // Transcripts & Utterances
   async uploadTranscript(
     projectId: string,
     expertId: string,
@@ -185,7 +180,6 @@ export const api = {
     }
   },
 
-  // Analysis Pipeline & Grounded Answers
   async runAnalysis(
     projectId: string,
     transcriptIds?: string[]
@@ -267,7 +261,6 @@ export const api = {
     }>(res);
   },
 
-  // Evidence
   async getEvidenceList(
     projectId: string
   ): Promise<{ evidence: Evidence[]; total: number }> {
@@ -284,7 +277,6 @@ export const api = {
     return handleResponse<Evidence>(res);
   },
 
-  // Differences
   async getDifferences(
     projectId: string
   ): Promise<{ differences: Difference[]; total: number }> {
@@ -294,7 +286,6 @@ export const api = {
     return handleResponse<{ differences: Difference[]; total: number }>(res);
   },
 
-  // Insights
   async getInsights(
     projectId: string
   ): Promise<{ insights: Insight[]; total: number }> {
@@ -304,7 +295,6 @@ export const api = {
     return handleResponse<{ insights: Insight[]; total: number }>(res);
   },
 
-  // Copilot
   async askCopilot(
     projectId: string,
     question: string

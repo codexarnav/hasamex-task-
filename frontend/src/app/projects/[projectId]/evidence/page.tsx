@@ -136,7 +136,7 @@ export default function EvidenceExplorerPage({
         description="All grounded qualitative evidence segments extracted from transcript utterances with exact timestamp provenance."
       />
 
-      {/* Search & Filter Toolbar */}
+      {}
       <div className="flex flex-col sm:flex-row items-center gap-3 bg-card p-4 rounded-xl border border-border shadow-2xs">
         <div className="relative flex-1 w-full">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -177,7 +177,7 @@ export default function EvidenceExplorerPage({
         </div>
       </div>
 
-      {/* Evidence Cards Grid */}
+      {}
       {filteredEvidence.length > 0 ? (
         <div className="grid gap-4 sm:grid-cols-2">
           {filteredEvidence.map((ev) => (
@@ -206,7 +206,7 @@ export default function EvidenceExplorerPage({
         />
       )}
 
-      {/* Evidence Drawer */}
+      {}
       <EvidenceDrawer
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -214,7 +214,7 @@ export default function EvidenceExplorerPage({
         onOpenTranscript={handleOpenTranscript}
       />
 
-      {/* Transcript Viewer Modal */}
+      {}
       {activeTranscript && (
         <TranscriptViewer
           isOpen={viewerOpen}

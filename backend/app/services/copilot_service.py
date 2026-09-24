@@ -26,13 +26,11 @@ class CopilotService:
 
     async def ask(self, project_id: UUID, question: str) -> CopilotResponse:
         """Process an arbitrary researcher query with dynamic retrieval and grounded synthesis."""
-        # 1. Verify project exists
         p_stmt = select(Project).where(Project.id == project_id)
         p_res = await self.db.execute(p_stmt)
         if not p_res.scalar_one_or_none():
             raise ProjectNotFoundError(project_id)
 
-        # 2. Fetch available evidence pool for this project
         ev_stmt = (
             select(Evidence)
             .where(Evidence.project_id == project_id)
@@ -58,12 +56,10 @@ class CopilotService:
             for ev in evidence_records
         ]
 
-        # 3. Fetch utterances for prompt context
         u_stmt = select(Utterance).join(Transcript).where(Transcript.project_id == project_id)
         u_res = await self.db.execute(u_stmt)
         utterance_map = {str(u.id): u for u in u_res.scalars().all()}
 
-        # 4. Run copilot graph
         initial_state = {
             "project_id": str(project_id),
             "query": question,
@@ -78,7 +74,6 @@ class CopilotService:
 
         final_state = await copilot_graph.ainvoke(initial_state)
 
-        # If retrieved utterances need text populated
         if final_state.get("retrieved_utterances") and not final_state.get("synthesized_answer"):
             for u in final_state["retrieved_utterances"]:
                 u_obj = utterance_map.get(u["utterance_id"])
@@ -89,7 +84,6 @@ class CopilotService:
             synth_res = await synthesize_answer_node(final_state)
             final_state.update(synth_res)
 
-        # 5. Resolve referenced evidence into full provenance responses
         ref_ids = final_state.get("referenced_evidence_ids", [])
         resolved_evidence = []
 

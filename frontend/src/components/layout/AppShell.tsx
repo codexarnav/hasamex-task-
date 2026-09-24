@@ -37,12 +37,12 @@ export function AppShell({
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-background">
-      {/* Desktop Sidebar */}
+      {}
       <div className="hidden md:flex shrink-0">
         <Sidebar projectId={projectId} projectName={activeName} />
       </div>
 
-      {/* Mobile Drawer Sidebar */}
+      {}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 md:hidden flex">
           <div
@@ -55,7 +55,7 @@ export function AppShell({
         </div>
       )}
 
-      {/* Main Workspace Area */}
+      {}
       <div className="flex flex-1 flex-col min-w-0 overflow-hidden">
         <TopBar
           projectId={projectId}

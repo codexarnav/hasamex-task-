@@ -20,7 +20,6 @@ async def create_expert(
     db: AsyncSession = Depends(get_db),
 ):
     """Register an expert interviewee for a research project."""
-    # Verify project exists
     p_stmt = select(Project).where(Project.id == project_id)
     p_res = await db.execute(p_stmt)
     if not p_res.scalar_one_or_none():

@@ -58,11 +58,9 @@ async def test_project_cascade_delete(db_session: AsyncSession):
     db_session.add(utterance)
     await db_session.flush()
 
-    # Delete project
     await db_session.delete(project)
     await db_session.flush()
 
-    # Verify cascades
     q_res = await db_session.execute(select(ResearchQuestion).where(ResearchQuestion.project_id == project.id))
     assert q_res.scalar_one_or_none() is None
 

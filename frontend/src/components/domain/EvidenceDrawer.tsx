@@ -47,7 +47,7 @@ export function EvidenceDrawer({
       />
       <div className="fixed inset-y-0 right-0 flex max-w-full pl-10">
         <div className="w-screen max-w-md transform bg-card border-l border-border shadow-2xl transition-all">
-          {/* Header */}
+          {}
           <div className="flex h-16 items-center justify-between border-b border-border px-6">
             <div>
               <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
@@ -67,9 +67,9 @@ export function EvidenceDrawer({
             </Button>
           </div>
 
-          {/* Body Content */}
+          {}
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            {/* Metadata Card */}
+            {}
             <div className="rounded-lg border border-border bg-slate-50/70 p-4 space-y-3 text-xs">
               <div className="flex items-center gap-2 text-foreground font-medium">
                 <User className="h-3.5 w-3.5 text-slate-500" />
@@ -93,7 +93,7 @@ export function EvidenceDrawer({
               </div>
             </div>
 
-            {/* Exact Quote */}
+            {}
             <div>
               <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
                 Canonical Quote
@@ -103,7 +103,7 @@ export function EvidenceDrawer({
               </blockquote>
             </div>
 
-            {/* Topic & Relevance */}
+            {}
             {evidence.topic && (
               <div>
                 <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
@@ -115,7 +115,7 @@ export function EvidenceDrawer({
               </div>
             )}
 
-            {/* Provenance Chain Note */}
+            {}
             <div className="rounded-lg border border-border p-4 bg-white text-xs space-y-1.5 text-muted-foreground">
               <div className="font-semibold text-foreground">Anti-Hallucination Guarantee</div>
               <p className="leading-normal">
@@ -124,7 +124,7 @@ export function EvidenceDrawer({
             </div>
           </div>
 
-          {/* Footer Actions */}
+          {}
           {onOpenTranscript && (
             <div className="border-t border-border p-4 bg-slate-50/50">
               <Button

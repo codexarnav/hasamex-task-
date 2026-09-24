@@ -25,7 +25,6 @@ def test_storage_path_traversal_prevention(tmp_path):
     storage.base_dir = tmp_path
 
     project_id = uuid4()
-    # Test path traversal filename sanitization
     rel_path = storage.save(project_id, "../../etc/passwd", b"malicious")
     assert ".." not in rel_path
     assert str(project_id) in rel_path

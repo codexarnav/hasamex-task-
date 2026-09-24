@@ -19,8 +19,8 @@ class CopilotState(TypedDict):
     """LangGraph state for Research Copilot question answering."""
     project_id: str
     query: str
-    retrieved_utterances: list[dict] # [{utterance_id, expert_name, market, text, timestamp_start, timestamp_end}]
-    evidence_pool: list[dict] # [{id, quote, expert_name, timestamp_start, timestamp_end}]
+    retrieved_utterances: list[dict]
+    evidence_pool: list[dict]
     synthesized_answer: str | None
     referenced_evidence_ids: list[str]
     insufficient_evidence: bool
@@ -74,7 +74,6 @@ async def synthesize_answer_node(state: CopilotState) -> dict:
 
     try:
         context_items = []
-        # Add available evidence
         for ev in evidence_pool:
             ts = f"[{ev.get('timestamp_start', 'N/A')} - {ev.get('timestamp_end', 'N/A')}]"
             context_items.append(
@@ -82,7 +81,6 @@ async def synthesize_answer_node(state: CopilotState) -> dict:
                 f"Quote: \"{ev['quote']}\""
             )
 
-        # Add retrieved utterances if distinct
         for utt in retrieved_utterances:
             if "text" in utt and utt["text"]:
                 ts = f"[{utt.get('timestamp_start', 'N/A')} - {utt.get('timestamp_end', 'N/A')}]"
@@ -103,14 +101,12 @@ async def synthesize_answer_node(state: CopilotState) -> dict:
             system_prompt=COPILOT_SYSTEM_PROMPT,
         )
 
-        # Validate evidence IDs
         available_ids = {str(ev["id"]) for ev in evidence_pool}
         valid_refs = [
             str(eid) for eid in result.evidence_ids
             if str(eid) in available_ids
         ]
         if not valid_refs and not result.insufficient_evidence and evidence_pool:
-            # Fallback to top evidence items if model synthesized from context
             valid_refs = list(available_ids)[:3]
 
         return {

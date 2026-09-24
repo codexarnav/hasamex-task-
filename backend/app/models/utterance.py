@@ -30,7 +30,6 @@ class Utterance(Base):
         DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc)
     )
 
-    # Relationships
     transcript: Mapped["Transcript"] = relationship("Transcript", back_populates="utterances")
     expert: Mapped["Expert"] = relationship("Expert", back_populates="utterances")
     evidence: Mapped[list["Evidence"]] = relationship(
